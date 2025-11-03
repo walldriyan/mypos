@@ -1,12 +1,20 @@
-import Image from "next/image";
-import Example from "./components/Example";
+
+
+import { LSidebar } from "./components/LSidebar";
+import { bottomMenuData, menuData, workspaceData } from "./data/sidebarData";
+
 
 export default function Home() {
+
+
   return (
     <>
-    <div>home page</div>
-   <Example />
+ <LSidebar
+            menuItems={menuData}
+            workspaces={workspaceData}
+            bottomItems={bottomMenuData}
+            userInitials="AB"
+          />
     </>
-    
   );
 }

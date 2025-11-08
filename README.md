@@ -1,36 +1,63 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Firebase Studio
 
-## Getting Started
+This is a NextJS starter in Firebase Studio.
 
-First, run the development server:
+To get started, take a look at src/app/page.tsx.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+npx prisma generate
+npx prisma db push
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+npx prisma generate
+prisma db push --force-reset
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+model ProductBatch {
+  id                      String    @id @default(cuid())
+  productId               String
+  batchNumber             String
+  stock                   Int
+  quantity                Int
+  costPrice               Float?
+  sellingPrice            Float
+  barcode                 String?   @unique
+  addedDate               DateTime
+  manufactureDate         DateTime?
+  expiryDate              DateTime?
+  location                String?
+  notes                   String?
+  tax                     Float?
+  taxtype                 String?
+  discount                Float?
+  discountType            String?
+  supplierId              String?
+  goodsReceivedNoteItem   GoodsReceivedNoteItem?
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
+  product  Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  supplier Supplier? @relation(fields: [supplierId], references: [id], onDelete: SetNull)
+  lines    TransactionLine[]
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+  @@unique([productId, batchNumber])
+}
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+model GoodsReceivedNoteItem {
+  id             String       @id @default(cuid())
+  grnId          String
+  productBatchId String       @unique
+  quantity       Int
+  costPrice      Float
+  discount       Float
+  tax            Float
+  total          Float
+
+  
+  discountType String?
+  taxType      String?
+
+  grn            GoodsReceivedNote @relation(fields: [grnId], references: [id], onDelete: Cascade)
+  productBatch   ProductBatch      @relation(fields: [productBatchId], references: [id], onDelete: Restrict)
+}
